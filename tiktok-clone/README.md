@@ -1,4 +1,4 @@
-# TikTok Clone 🎬
+# TikTok Clone 
 
 ## 1. User Documentation
 

@@ -59,7 +59,7 @@ The Weather API Dashboard is a simple web application that demonstrates how to u
 
 ---
 
-## ✅ Notes
+## Notes
 - This project is designed for **academic demonstration** of RESTful APIs.  
 - JSONPlaceholder is used as a mock backend, so saved data is not permanent.  
 - The application is lightweight and runs entirely in the browser.  
