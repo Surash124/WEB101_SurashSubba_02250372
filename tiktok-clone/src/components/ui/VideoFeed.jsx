@@ -1,41 +1,55 @@
 'use client';
+import { useState, useEffect } from 'react';
 import VideoCard from './VideoCard';
-
-// Sample data for our feed
-const DUMMY_POSTS = [
-  {
-    id: '1',
-    username: '@user1',
-    caption: 'Check out this cool video! #trending #tiktok #viral',
-    audio: 'Original Sound - User1',
-    likes: 1234,
-    comments: 432,
-    shares: 89
-  },
-  {
-    id: '2',
-    username: '@user2',
-    caption: 'Learning to dance 💃 #dance #fun #trending',
-    audio: 'Popular Song - Artist',
-    likes: 5678,
-    comments: 321,
-    shares: 52
-  },
-  {
-    id: '3',
-    username: '@user3',
-    caption: 'Beautiful sunset today! #nature #sunset #vibes',
-    audio: 'Sunset Vibes - Chill Music',
-    likes: 2468,
-    comments: 135,
-    shares: 46
-  }
-];
+import { videoService } from '@/services/videoService';
 
 export default function VideoFeed() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const data = await videoService.getAllVideos();
+        setPosts(data);
+      } catch (err) {
+        console.error('Failed to fetch videos:', err);
+        setError('Failed to load videos. Make sure the backend is running.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVideos();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-[550px] mx-auto py-10 text-center text-gray-400">
+        Loading videos...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-[550px] mx-auto py-10 text-center text-red-400">
+        {error}
+      </div>
+    );
+  }
+
+  if (posts.length === 0) {
+    return (
+      <div className="max-w-[550px] mx-auto py-10 text-center text-gray-400">
+        No videos yet. Be the first to upload!
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-[550px] mx-auto">
-      {DUMMY_POSTS.map((post) => (
+      {posts.map((post) => (
         <VideoCard key={post.id} post={post} />
       ))}
     </div>
