@@ -1,11 +1,13 @@
 import api from '@/lib/api-config';
 
 export const videoService = {
-  getAllVideos: async () => {
-    const response = await api.get('/videos');
+  getAllVideos: async ({ pageParam = null } = {}) => {
+    const params = new URLSearchParams({ limit: 10 });
+    if (pageParam) params.append('cursor', pageParam);
+    const response = await api.get(`/videos?${params}`);
     return response.data;
   },
-
+  
   getVideoById: async (id) => {
     const response = await api.get(`/videos/${id}`);
     return response.data;
@@ -43,8 +45,10 @@ export const videoService = {
     return response.data;
   },
 
-  getFollowingVideos: async (userId) => {
-    const response = await api.get(`/users/${userId}/following-videos`);
+  getFollowingVideos: async ({ pageParam = null, userId } = {}) => {  // updated
+    const params = new URLSearchParams({ limit: 10 });
+    if (pageParam) params.append('cursor', pageParam);
+    const response = await api.get(`/users/${userId}/following-videos?${params}`);
     return response.data;
   },
 };

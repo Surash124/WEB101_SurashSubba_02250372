@@ -1,24 +1,31 @@
-import { Inter } from 'next/font/google';
-import './globals.css';
-import MainLayout from '@/components/layout/MainLayout';
-import { AuthProvider } from '@/contexts/authContext';
+'use client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { AuthProvider } from '../contexts/authContext';
 import { Toaster } from 'react-hot-toast';
+import './globals.css';
+import MainLayout from '../components/layout/MainLayout';
 
-const inter = Inter({ subsets: ['latin'] });
-
-export const metadata = {
-  title: 'TikTok Clone',
-  description: 'A TikTok clone built with Next.js',
-};
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
-          <MainLayout>{children}</MainLayout>
-          <Toaster position="top-center" />
-        </AuthProvider>
+      <body>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <Toaster position="top-center" />
+            <MainLayout>{children}</MainLayout>
+          </AuthProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
       </body>
     </html>
   );

@@ -3,12 +3,15 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/authContext';
 import { userService } from '@/services/userService';
+import { useSearchParams } from 'next/navigation';
 
 export default function ExploreUsersPage() {
   const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState({});
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
 
   useEffect(() => {
     const fetch = async () => {
@@ -65,14 +68,26 @@ export default function ExploreUsersPage() {
     );
   }
 
-  const displayUsers = user ? users.filter((u) => u.id !== user.id) : users;
+  // filter out current user + apply search query
+  const displayUsers = users
+    .filter((u) => user ? u.id !== user.id : true)
+    .filter((u) =>
+      searchQuery
+        ? u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (u.name && u.name.toLowerCase().includes(searchQuery.toLowerCase()))
+        : true
+    );
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Discover People</h2>
+      <h2 className="text-2xl font-bold mb-6">
+        {searchQuery ? `Results for "${searchQuery}"` : 'Discover People'}
+      </h2>
 
       {displayUsers.length === 0 ? (
-        <p className="text-gray-500">No other users found.</p>
+        <p className="text-gray-500">
+          {searchQuery ? `No users found for "${searchQuery}"` : 'No other users found.'}
+        </p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {displayUsers.map((u) => (

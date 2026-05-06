@@ -14,6 +14,7 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('videos');
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
   const isOwnProfile = currentUser && currentUser.id === parseInt(userId);
   const isFollowing =
@@ -156,7 +157,7 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Videos grid */}
+      {/* Videos tab */}
       {activeTab === 'videos' && (
         <>
           {videos.length === 0 ? (
@@ -182,10 +183,15 @@ export default function UserProfilePage() {
               {videos.map((video) => (
                 <div
                   key={video.id}
+                  onClick={() => setSelectedVideo(video)}
                   className="aspect-[9/16] bg-gray-300 rounded-md flex items-center justify-center relative overflow-hidden cursor-pointer hover:opacity-90"
                 >
                   {video.url ? (
-                    <video src={video.url ? `http://localhost:8000${video.url}` : ''} className="w-full h-full object-cover" muted />
+                    <video
+                      src={`http://localhost:8000${video.url}`}
+                      className="w-full h-full object-cover"
+                      muted
+                    />
                   ) : (
                     <p className="text-sm text-gray-500 p-2 text-center">{video.title}</p>
                   )}
@@ -199,9 +205,41 @@ export default function UserProfilePage() {
         </>
       )}
 
+      {/* Liked tab */}
       {activeTab === 'liked' && (
         <div className="py-20 text-center text-gray-400">
           Liked videos are private.
+        </div>
+      )}
+
+      {/* Video Modal */}
+      {selectedVideo && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
+          onClick={() => setSelectedVideo(null)}
+        >
+          <div
+            className="relative bg-black rounded-xl overflow-hidden"
+            style={{ width: '360px', height: '640px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedVideo(null)}
+              className="absolute top-3 right-3 text-white text-xl z-10 bg-black bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center hover:bg-opacity-80"
+            >
+              ✕
+            </button>
+            <video
+              src={`http://localhost:8000${selectedVideo.url}`}
+              className="w-full h-full object-cover"
+              controls
+              autoPlay
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+              <p className="text-white font-semibold text-sm">@{selectedVideo.username}</p>
+              <p className="text-white text-xs mt-1 opacity-80">{selectedVideo.caption}</p>
+            </div>
+          </div>
         </div>
       )}
     </div>

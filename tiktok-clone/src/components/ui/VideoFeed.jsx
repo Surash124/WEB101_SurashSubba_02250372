@@ -1,29 +1,39 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import VideoCard from './VideoCard';
 import { videoService } from '@/services/videoService';
+import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
 export default function VideoFeed() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = useInfiniteQuery({
+    queryKey: ['videos'],
+    queryFn: videoService.getAllVideos,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+  });
 
+  const [loaderRef, isIntersecting] = useIntersectionObserver({
+    threshold: 0.1,
+    freezeOnceVisible: false,
+  });
+
+  // trigger fetch when loader div is visible
   useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        const data = await videoService.getAllVideos();
-        setPosts(data);
-      } catch (err) {
-        console.error('Failed to fetch videos:', err);
-        setError('Failed to load videos. Make sure the backend is running.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchVideos();
-  }, []);
+    if (isIntersecting && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [isIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (loading) {
+  const posts = data?.pages.flatMap((page) => page.videos) ?? [];
+
+  if (isLoading) {
     return (
       <div className="max-w-[550px] mx-auto py-10 text-center text-gray-400">
         Loading videos...
@@ -31,10 +41,10 @@ export default function VideoFeed() {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="max-w-[550px] mx-auto py-10 text-center text-red-400">
-        {error}
+        Failed to load videos. Make sure the backend is running.
       </div>
     );
   }
@@ -52,6 +62,10 @@ export default function VideoFeed() {
       {posts.map((post) => (
         <VideoCard key={post.id} post={post} />
       ))}
+
+      <div ref={loaderRef} className="py-4 text-center text-gray-400">
+        {isFetchingNextPage ? 'Loading more...' : hasNextPage ? '' : 'No more videos'}
+      </div>
     </div>
   );
 }

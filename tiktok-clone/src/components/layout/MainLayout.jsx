@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/authContext';
 import AuthModal from '@/components/auth/AuthModal';
+import { useRouter } from 'next/navigation';
 import {
   FaHome, FaUserFriends, FaCompass, FaVideo,
   FaInbox, FaRegUser, FaPlus, FaSearch,
@@ -11,6 +12,14 @@ import {
 export default function MainLayout({ children }) {
   const { user, logout } = useAuth();
   const [authModal, setAuthModal] = useState({ open: false, view: 'login' });
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      router.push(`/explore-users?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   const openLogin = () => setAuthModal({ open: true, view: 'login' });
   const openSignup = () => setAuthModal({ open: true, view: 'signup' });
@@ -125,6 +134,9 @@ export default function MainLayout({ children }) {
               <input
                 type="text"
                 placeholder="Search accounts and videos"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
                 className="w-full bg-gray-100 py-2 pl-10 pr-4 rounded-full focus:outline-none focus:ring-1 focus:ring-gray-400"
               />
               <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />

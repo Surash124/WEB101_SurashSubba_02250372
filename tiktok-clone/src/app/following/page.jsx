@@ -18,7 +18,7 @@ export default function FollowingPage() {
     }
     const fetch = async () => {
       try {
-        const data = await videoService.getFollowingVideos(user.id);
+        const data = await videoService.getFollowingVideos({ userId: user.id });
         setVideos(data);
       } catch (err) {
         setError('Failed to load following feed.');

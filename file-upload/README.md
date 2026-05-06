@@ -1,69 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# File Upload Implementation
 
-## File Upload 
-This is an implementation of a file upload feature in React and Next.js, demonstrating best practices for multipart form handling, file validation, progress tracking, and drag-and-drop interfaces. It provides both frontend React components and API routes for backend functionality.
+This project is a **Next.js** application demonstrating secure and interactive file handling[cite: 2].
 
-🚀 Features
+---
 
-✅ Multipart form data handling
+## 1. Documentation
 
-✅ File type validation (JPEG, PNG, PDF)
+### Overview
+A React-based upload system featuring real-time validation and progress tracking.
 
-✅ File size restrictions (5MB limit)
+### Key Features
+*   **Drag & Drop**: Intuitive file selection via `react-dropzone`.
+*   **Validation**: Restricts file types and sizes (e.g., image-only limits).
+*   **Live Progress**: Visual tracking using `axios` progress events.
+*   **Secure Parsing**: Backend processing with `formidable`.
 
-✅ Upload progress tracking
+---
 
-✅ Drag and drop interface
+## 2. Technical Guide
 
-✅ Preview for image uploads
+### Tech Stack
+*   **Frontend**: Next.js, React Hook Form.
+*   **Backend**: Node.js API Routes.
+*   **Libraries**: Axios, Formidable, React-Dropzone.
 
-✅ Multiple file upload support
+### Project Structure
+*   `pages/index.js`: UI with form and drag-and-drop.
+*   `pages/api/upload.js`: Server-side file processing.
 
-✅ Serverless API route for file storage
+---
 
- ### Key dependencies include:
+## 3. Setup
 
-`react-hook-form` for form management
-
-`react-dropzone` for drag and drop functionality
-
-`axios` for HTTP requests with progress tracking
-
-`formidable` for parsing multipart form data on the server
-
-📋 Prerequisites
-
-Before getting started, make sure you have the following installed:
-
-    Node.js (v14 or newer)
-
-    npm or yarn
-
-    Git
-
-
-
-## Getting Started
-
-First, run the development server:
-
+### Installation
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Initialize
+npx create-next-app file-upload
+cd file-upload
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Install tools
+npm install react-hook-form formidable axios react-dropzone
+```[cite: 2]
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Reference
+Refer to **"https://github.com/syangche/React_Practicals.git "**
