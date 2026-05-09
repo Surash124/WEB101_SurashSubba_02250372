@@ -61,7 +61,10 @@ export default function VideoCard({ post, onUpdate }) {
     } catch (err) {
       console.error('Comment error:', err);
     }
-  };
+  }
+  console.log('Video URL:', post.url);
+
+
 
   return (
     <div className="flex py-6 border-b">
@@ -97,8 +100,7 @@ export default function VideoCard({ post, onUpdate }) {
           <div className="mr-5 w-[300px] h-[530px] bg-black rounded-md flex items-center justify-center relative overflow-hidden">
             {post.url ? (
               <video
-                src={post.url ? `http://localhost:8000${post.url}` : ''}
-
+                src={post.url ? (post.url.startsWith('http') ? post.url : `http://localhost:8000${post.url}`) : ''}
                 
                 controls
                 loop

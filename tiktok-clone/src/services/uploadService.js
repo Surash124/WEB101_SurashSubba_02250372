@@ -1,7 +1,7 @@
 // src/services/uploadService.js
 
-import { supabase } from "../lib/supabaseClient";   // ✅ relative path
-import apiClient from "../lib/api-config";          // ✅ relative path
+import supabase from "../lib/supabase";  // relative path
+import apiClient from "../lib/api-config";          // relative path
 
 // Generate a unique file name
 const generateUniqueFileName = (originalName) => {

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/authContext';
 import { videoService } from '@/services/videoService';
 import Link from 'next/link';
+import { uploadVideoToStorage, uploadThumbnailToStorage, createVideo } from '@/services/uploadService';
 
 export default function UploadPage() {
   const { user } = useAuth();
@@ -17,6 +18,9 @@ export default function UploadPage() {
   const [allowStitch, setAllowStitch] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  // To allow users to upload their own thumbnail
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+const [thumbnailPreview, setThumbnailPreview] = useState('');
 
   if (!user) {
     return (
@@ -60,13 +64,30 @@ export default function UploadPage() {
     setIsLoading(true);
     setError('');
     try {
-      const formData = new FormData();
-      formData.append('video', file);
-      formData.append('title', caption);
-      formData.append('description', caption);
-      formData.append('userId', user.id);
-      formData.append('privacy', privacy);
-      await videoService.createVideo(formData);
+      // Upload video to Supabase
+      const { url: videoUrl, storagePath: videoStoragePath } = await uploadVideoToStorage(user.id, file);
+
+      // Upload thumbnail if exists
+      let thumbnailUrl = '';
+      let thumbnailStoragePath = '';
+      if (thumbnailFile) {
+        const thumbResult = await uploadThumbnailToStorage(user.id, thumbnailFile);
+        thumbnailUrl = thumbResult.url;
+        thumbnailStoragePath = thumbResult.storagePath;
+      }
+
+      // Save to backend DB
+      await createVideo({
+        title: caption,
+        description: caption,
+        userId: user.id,
+        url: videoUrl,
+        videoStoragePath,
+        thumbnailUrl,
+        thumbnailStoragePath,
+        privacy,
+      });
+
       router.push(`/profile/${user.id}`);
     } catch (err) {
       setError(err.response?.data?.error || 'Upload failed. Please try again.');
@@ -156,11 +177,51 @@ export default function UploadPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Cover</label>
-            <div className="h-20 bg-gray-200 rounded-md flex items-center justify-center text-gray-400 text-sm">
-              {preview ? 'Video thumbnail' : 'No video selected'}
-            </div>
-          </div>
+  <label className="block text-sm font-medium mb-2">Cover</label>
+  {preview ? (
+    <div className="relative">
+      {/* Show selected thumbnail or video frame */}
+      {thumbnailPreview ? (
+        <img
+          src={thumbnailPreview}
+          className="w-full h-32 object-cover rounded-md"
+          alt="thumbnail"
+        />
+      ) : (
+        <video
+          src={preview}
+          className="w-full h-32 object-cover rounded-md"
+          muted
+          onLoadedMetadata={(e) => { e.target.currentTime = 1; }}
+        />
+      )}
+      {/* Upload custom thumbnail button */}
+      <button
+        onClick={() => document.getElementById('thumbnail-input').click()}
+        className="mt-2 text-sm text-red-500 hover:underline"
+      >
+        {thumbnailPreview ? 'Change thumbnail' : 'Upload custom thumbnail'}
+      </button>
+      <input
+        id="thumbnail-input"
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files[0];
+          if (file) {
+            setThumbnailFile(file);
+            setThumbnailPreview(URL.createObjectURL(file));
+          }
+        }}
+      />
+    </div>
+  ) : (
+    <div className="h-20 bg-gray-200 rounded-md flex items-center justify-center text-gray-400 text-sm">
+      No video selected
+    </div>
+  )}
+</div>
 
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">Who can view this video</label>

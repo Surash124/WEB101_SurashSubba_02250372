@@ -188,7 +188,8 @@ export default function UserProfilePage() {
                 >
                   {video.url ? (
                     <video
-                      src={`http://localhost:8000${video.url}`}
+                      s// Video grid thumbnail
+                      src={video.url.startsWith('http') ? video.url : `http://localhost:8000${video.url}`}
                       className="w-full h-full object-cover"
                       muted
                     />
@@ -230,7 +231,8 @@ export default function UserProfilePage() {
               ✕
             </button>
             <video
-              src={`http://localhost:8000${selectedVideo.url}`}
+              // Modal
+              src={selectedVideo.url.startsWith('http') ? selectedVideo.url : `http://localhost:8000${selectedVideo.url}`}
               className="w-full h-full object-cover"
               controls
               autoPlay
